@@ -50,10 +50,11 @@
     (_: {
       home.packages = with pkgs; [
         # pokego # Overlayed
-        # krita
+        krita
         github-desktop
-        # gimp
+        gimp
         obsidian
+        vlc
       ];
     })
   ];

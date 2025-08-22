@@ -16,7 +16,7 @@
     ./programs/hypridle
     ./programs/hyprlock
     ./programs/swaync
-    # ./programs/dunst
+    ./programs/dunst
   ];
 
   nix.settings = {
@@ -65,7 +65,7 @@
         wl-clipboard
         xdotool
         yad
-        # socat # for and autowaybar.sh
+        socat # for and autowaybar.sh
         # jq # for and autowaybar.sh
       ];
 
@@ -214,7 +214,7 @@
             ];
           };
           render = {
-            direct_scanout = 2; # 0 = off, 1 = on, 2 = auto (on with content type ‘game’) 
+            direct_scanout = 2; # 0 = off, 1 = on, 2 = auto (on with content type ‘game’)
           };
           ecosystem = {
             no_update_news = true;
@@ -501,7 +501,7 @@
         };
         extraConfig = ''
           binds {
-            workspace_back_and_forth = 0
+            workspace_back_and_forth = 1
             #allow_workspace_cycles=1
             #pass_mouse_when_bound=0
           }
@@ -509,22 +509,21 @@
           # Easily plug in any monitor
           monitor=,preferred,auto,1
 
-          # 1080p-HDR monitor on the left, 4K-HDR monitor in the middle and 1080p vertical monitor on the right.
-          monitor=desc:BNQ BenQ EW277HDR 99J01861SL0,preferred,-1920x0,1
-          monitor=desc:BNQ BenQ EL2870U PCK00489SL0,preferred,0x0,2
-          monitor=desc:BNQ BenQ xl2420t 99D06760SL0,preferred,1920x-420,1,transform,1 # 5 for fipped
+          # Correct monitor setup based on your actual hardware
+          monitor=desc:LG Electronics LG TV SSCR2 0x01010101,preferred,0x0,1           # LG TV (left)
+          monitor=desc:Dell Inc. XPS 2720 HH117829111S,preferred,3840x1080,1           # Dell monitor (right, bottom-aligned)
 
-          # Binds workspaces to my monitors only (find desc with: hyprctl monitors)
-          workspace=1,monitor:desc:BNQ BenQ EL2870U PCK00489SL0,default:true
-          workspace=2,monitor:desc:BNQ BenQ EL2870U PCK00489SL0
-          workspace=3,monitor:desc:BNQ BenQ EL2870U PCK00489SL0
-          workspace=4,monitor:desc:BNQ BenQ EL2870U PCK00489SL0
-          workspace=5,monitor:desc:BNQ BenQ EW277HDR 99J01861SL0,default:true
-          workspace=6,monitor:desc:BNQ BenQ EW277HDR 99J01861SL0
-          workspace=7,monitor:desc:BNQ BenQ EW277HDR 99J01861SL0
-          workspace=8,monitor:desc:BNQ BenQ xl2420t 99D06760SL0,default:true
-          workspace=9,monitor:desc:BNQ BenQ xl2420t 99D06760SL0
-          workspace=10,monitor:desc:BNQ BenQ EL2870U PCK00489SL0
+          # Updated workspace assignments
+          workspace=1,monitor:desc:LG Electronics LG TV SSCR2 0x01010101,default:true  # LG TV primary
+          workspace=2,monitor:desc:LG Electronics LG TV SSCR2 0x01010101
+          workspace=3,monitor:desc:LG Electronics LG TV SSCR2 0x01010101
+          workspace=4,monitor:desc:LG Electronics LG TV SSCR2 0x01010101
+          workspace=5,monitor:desc:LG Electronics LG TV SSCR2 0x01010101
+          workspace=6,monitor:desc:Dell Inc. XPS 2720 HH117829111S,default:true        # Dell monitor
+          workspace=7,monitor:desc:Dell Inc. XPS 2720 HH117829111S
+          workspace=8,monitor:desc:Dell Inc. XPS 2720 HH117829111S
+          workspace=9,monitor:desc:Dell Inc. XPS 2720 HH117829111S
+          workspace=10,monitor:desc:Dell Inc. XPS 2720 HH117829111S
         '';
       };
     })

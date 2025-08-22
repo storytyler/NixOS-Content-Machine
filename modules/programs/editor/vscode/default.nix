@@ -36,7 +36,7 @@
             # pkief.material-icon-theme
             # equinusocio.vsc-material-theme
             # dracula-theme.theme-dracula
-          ];  
+          ];
           keybindings = [
             {
               key = "ctrl+q";

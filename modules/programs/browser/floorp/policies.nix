@@ -152,7 +152,8 @@
       # previewNewestDesign = true; # TODO: test
 
       # Catppuccin mocha theme
-      /* theme = {
+      /*
+         theme = {
         mode = 1;
         brightness = 100;
         contrast = 100;
@@ -173,7 +174,8 @@
         lightColorScheme = "Default";
         darkColorScheme = "Default";
         immediateModify = false;
-      }; */
+      };
+      */
 
       # enabledFor = [];
       # disabledFor = [];
