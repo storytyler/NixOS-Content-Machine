@@ -34,9 +34,9 @@
     ../../modules/programs/shell/zsh
     ../../modules/programs/media/discord
     ../../modules/programs/media/spicetify
-    # ../../modules/programs/media/youtube-music
-    # ../../modules/programs/media/thunderbird
-    # ../../modules/programs/media/obs-studio
+    ../../modules/programs/media/youtube-music
+    ../../modules/programs/media/thunderbird
+    ../../modules/programs/media/obs-studio
     ../../modules/programs/media/mpv
     ../../modules/programs/misc/tlp
     ../../modules/programs/misc/thunar
@@ -74,7 +74,7 @@
       media_dir = [
         # A = Audio, P = Pictures, V, = Videos, PV = Pictures and Videos.
         # "A,/mnt/work/Pimsleur/Russian"
-        "/mnt/work/Pimsleur"
+        "/mnt/work/NixOS"
         "/mnt/work/Media/Films"
         "/mnt/work/Media/Series"
         "/mnt/work/Media/Videos"
