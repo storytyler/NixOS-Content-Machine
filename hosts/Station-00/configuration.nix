@@ -6,6 +6,7 @@
   editor,
   terminal,
   terminalFileManager,
+  machineConfig,
   ...
 }: {
   imports = [
@@ -45,11 +46,36 @@
     # ../../modules/programs/misc/virt-manager
   ];
 
+  # SDDM Display Manager Configuration - theme package automatically available via overlay
+  services.displayManager.sddm = {
+    enable = true;
+    package = pkgs.kdePackages.sddm;
+
+    # The themed package is instantiated via machine-level overlay
+    theme = "sddm-astronaut-theme";
+
+    settings = {
+      General = {
+        HaltCommand = "/run/current-system/systemd/bin/systemctl poweroff";
+        RebootCommand = "/run/current-system/systemd/bin/systemctl reboot";
+      };
+
+      Theme = {
+        Current = "sddm-astronaut-theme";
+        ThemeDir = "/run/current-system/sw/share/sddm/themes";
+      };
+    };
+  };
+
   # Home-manager config
   home-manager.sharedModules = [
     (_: {
       home.packages = with pkgs; [
-        # pokego # Overlayed
+        # The sddm-astronaut package is available via machine-level overlay
+        # and automatically themed according to machineConfig.sddmTheme
+        sddm-astronaut
+
+        # Original packages
         krita
         github-desktop
         gimp
@@ -59,8 +85,9 @@
     })
   ];
 
-  # Define system packages here
+  # System packages - themed package available automatically
   environment.systemPackages = with pkgs; [
+    sddm-astronaut # Automatically instantiated with correct theme
   ];
 
   networking.hostName = hostname; # Set hostname defined in flake.nix
@@ -74,11 +101,11 @@
       media_dir = [
         # A = Audio, P = Pictures, V, = Videos, PV = Pictures and Videos.
         # "A,/mnt/work/Pimsleur/Russian"
-        "/mnt/work/NixOS"
-        "/mnt/work/Media/Films"
-        "/mnt/work/Media/Series"
-        "/mnt/work/Media/Videos"
-        "/mnt/work/Media/Music"
+        # "/mnt/work/NixOS"
+        # "/mnt/work/Media/Films"
+        # "/mnt/work/Media/Series"
+        # "/mnt/work/Media/Videos"
+        # "/mnt/work/Media/Music"
       ];
       inotify = "yes";
       log_level = "error";

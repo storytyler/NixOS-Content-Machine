@@ -62,19 +62,25 @@ with lib; {
       # Prevent disk space issues
       min-free = mkDefault (100 * 1024 * 1024); # 100MB
       max-free = mkDefault (1024 * 1024 * 1024); # 1GB
+
+      # Build performance optimization
+      max-jobs = "auto";
+      cores = 0;
+      keep-outputs = true;
+      keep-derivations = true;
     };
 
-    # Garbage collection
+    # Conservative garbage collection with safety limits
     gc = mkDefault {
       automatic = true;
       dates = "weekly";
-      options = "--delete-older-than 14d";
+      options = "--delete-older-than 30d --max-freed 5G";
     };
 
     # Store optimization
     optimise = {
       automatic = true;
-      dates = ["weekly"];
+      dates = ["03:45"];
     };
   };
 
@@ -167,7 +173,7 @@ with lib; {
   # Filesystem support
   boot.supportedFilesystems = ["ntfs" "exfat" "ext4" "btrfs"];
 
-  # Basic system packages (minimal set for all machines)
+  # System packages with quality and development tools
   environment.systemPackages = with pkgs;
     [
       # Core utilities
@@ -198,6 +204,16 @@ with lib; {
 
       # Monitoring
       lm_sensors
+
+      # Configuration analysis and quality tools
+      deadnix # Find unused Nix code
+      statix # Nix linter and antipattern detector
+      nvd # Compare system generations
+      comma # Run binaries without installing
+
+      # System monitoring and maintenance
+      nix-du # Visualize Nix store disk usage
+      manix # Search Nix documentation
     ]
     ++ (optionals (machineConfig.role != "server") [
       # Desktop/laptop extras
@@ -206,6 +222,10 @@ with lib; {
       fd
       fzf
       jq
+
+      # Development workflow tools
+      nix-init # Generate Nix packages from URLs
+      nurl # Generate Nix fetcher calls
     ]);
 
   # Security basics
@@ -249,4 +269,101 @@ with lib; {
     XDG_BIN_HOME = "$HOME/.local/bin";
     FLAKE_DIR = "/home/${machineConfig.username}/NixOS";
   };
+
+  # User-level development environment enhancements
+  home-manager.sharedModules = [
+    (_: {
+      programs = {
+        # High-performance directory environment switching
+        direnv = {
+          enable = true;
+          nix-direnv.enable = true; # 10x faster shell loading
+          stdlib = ''
+            layout_poetry() {
+              if [[ ! -f pyproject.toml ]]; then
+                log_error 'No pyproject.toml found'
+                return 1
+              fi
+              layout python
+            }
+          '';
+        };
+
+        # Optimized Git configuration
+        git = {
+          enable = true;
+          userName = machineConfig.username;
+          userEmail = "${machineConfig.username}@nixos.local";
+
+          extraConfig = {
+            core.editor = machineConfig.editor;
+            pull.rebase = false;
+            init.defaultBranch = "main";
+
+            # Performance optimizations
+            core.preloadindex = true;
+            core.fscache = true;
+            gc.auto = 256;
+
+            # Enhanced workflow settings
+            diff.algorithm = "histogram";
+            merge.tool = "vimdiff";
+            push.default = "current";
+          };
+
+          # Convenient aliases for daily workflows
+          aliases = {
+            st = "status";
+            co = "checkout";
+            br = "branch";
+            unstage = "reset HEAD --";
+            last = "log -1 HEAD";
+            visual = "!gitk";
+          };
+        };
+
+        # Shell aliases for Nix workflows
+        bash = mkIf (machineConfig.shell == "bash") {
+          shellAliases = {
+            ll = "ls -l";
+            la = "ls -la";
+
+            # Quick Nix analysis commands
+            ndead = "deadnix";
+            nstat = "statix check";
+            ndiff = "nvd diff-closures /nix/var/nix/profiles/system-*-link | tail -20";
+            nstore = "nix-du";
+
+            # Development shortcuts
+            nsearch = "comma";
+            nshell = "nix develop";
+          };
+        };
+
+        zsh = mkIf (machineConfig.shell == "zsh") {
+          shellAliases = {
+            # Nix system analysis shortcuts
+            ndead = "deadnix";
+            nstat = "statix check";
+            ndiff = "nvd diff-closures /nix/var/nix/profiles/system-*-link | tail -20";
+            nstore = "nix-du -s 100M";
+          };
+        };
+      };
+
+      # Documentation and analysis tools
+      home.packages = with pkgs;
+        [
+          manix # Documentation search
+          nix-tree # Dependency graph browser
+          nix-du # Store usage visualization
+          nixpkgs-review # PR testing
+        ]
+        ++ (optionals (machineConfig.features.development or false) [
+          nix-update # Package version updates
+          nix-init # Package generation
+          nurl # Fetcher generation
+        ]);
+    })
+  ];
 }

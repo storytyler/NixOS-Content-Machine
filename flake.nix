@@ -58,23 +58,33 @@
       url = "github:cachix/devenv";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    # Automated quality checks for configuration files
+    pre-commit-hooks = {
+      url = "github:cachix/pre-commit-hooks.nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    # High-performance nix-shell replacement with caching
+    nix-direnv = {
+      url = "github:nix-community/nix-direnv";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    # Advanced Nix language server for development
+    nixd = {
+      url = "github:nix-community/nixd";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = {
-    self,
-    nixpkgs,
-    flake-parts,
-    ...
-  } @ inputs:
+  outputs = inputs @ {flake-parts, ...}:
     flake-parts.lib.mkFlake {inherit inputs;} {
-      systems = ["x86_64-linux" "aarch64-linux"];
-
-      # Import modular flake parts
+      systems = ["x86_64-linux"];
       imports = [
-        ./flake-parts/overlays.nix
-        ./flake-parts/packages.nix
-        ./flake-parts/machines.nix
         ./flake-parts/dev-shells.nix
+        ./flake-parts/machines.nix
+        ./flake-parts/packages.nix
       ];
 
       # Shared configuration across all flake parts
