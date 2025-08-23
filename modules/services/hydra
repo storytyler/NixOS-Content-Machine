@@ -1,0 +1,64 @@
+# /home/player00/NixOS/modules/services/hydra.nix
+{ config, pkgs, lib, ... }:
+
+let
+  # Directory to store GC roots for builds (keep large artifacts)
+  gcRootsDir = "/var/lib/hydra/gc-roots";
+
+  # Build machine configuration files (for multi-host)
+  buildMachinesFiles = [
+    "/etc/hydra/build-machines/station-00.nix"
+    "/etc/hydra/build-machines/subrelay-01.nix"
+    "/etc/hydra/build-machines/scout-02.nix"
+  ];
+in
+{
+  services.hydra = {
+    enable = true;
+
+    # Core binary cache options
+    useSubstitutes = true;        # Pull prebuilt binaries when possible
+    gcRootsDir = gcRootsDir;
+
+    # Networking & UI
+    listenHost = "0.0.0.0";       # Listen on all interfaces
+    port = 3000;                  # Default Hydra port
+    hydraURL = "http://station-00:3000"; # Public-facing URL for web UI
+    logo = "/etc/hydra/logo.png";
+
+    # Resource management
+    minSpareServers = 2;
+    maxSpareServers = 4;
+    maxServers = 8;
+    minimumDiskFreeEvaluator = true;
+    minimumDiskFree = "10GB";     # Prevent builds if disk is too low
+
+    # Database
+    dbi = {
+      type = "sqlite";            # Lightweight, good for single-node setups
+      path = "/var/lib/hydra/hydra.sqlite";
+    };
+
+    # Mail notifications
+    smtpHost = "smtp.example.com";
+    notificationSender = "hydra@example.com";
+
+    # Build machines for distributing jobs
+    buildMachinesFiles = buildMachinesFiles;
+
+    # Advanced / extra options
+    debugServer = false;          # Enable only for debugging
+    extraEnv = ''
+      NIX_REMOTE=daemon
+      NIX_SUBSTITUTERS="https://cache.nixos.org/ http://station-00:8080/"
+      NIX_TRUSTED_KEYS="cache.nixos.org-1:... hydra-local-key"
+    '';
+    extraConfig = ''
+      # Custom Hydra config snippets
+      # e.g., tweak evaluation concurrency
+      evaluationConcurrency = 4;
+    '';
+    package = pkgs.hydra;
+    tracker = "/var/lib/hydra/tracker";
+  };
+}
