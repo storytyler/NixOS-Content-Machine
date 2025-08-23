@@ -5,10 +5,18 @@
       default = pkgs.mkShell {
         name = "nixos-config-development";
         buildInputs = with pkgs; [
-          git gh alejandra
-          nixd deadnix statix nvd
-          nix-update nixpkgs-review npins
-          nix-du nix-tree
+          git
+          gh
+          alejandra
+          nixd
+          deadnix
+          statix
+          nvd
+          nix-update
+          nixpkgs-review
+          npins
+          nix-du
+          nix-tree
         ];
         shellHook = ''
           echo "NixOS Configuration Development Environment"
