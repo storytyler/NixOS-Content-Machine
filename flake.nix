@@ -14,7 +14,12 @@
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-
+    # Claude Code
+    claude-code = {
+      url = "github:sadjow/claude-code-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+   
     # Additional tools
     nix-index-database = {
       url = "github:nix-community/nix-index-database";
@@ -109,6 +114,7 @@
           desktop = import ./modules/desktop;
           server = import ./modules/server;
           laptop = import ./modules/laptop;
+          claude-code = import ./modules/services/claude-code;
         };
       };
     };

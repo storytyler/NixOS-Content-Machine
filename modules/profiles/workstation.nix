@@ -65,7 +65,7 @@ with lib; {
 
       # System tools
       gparted
-     # ventoy.1.1.05
+      # ventoy.1.1.05
     ]
     ++ (optionals machineConfig.features.development [
       vscode
