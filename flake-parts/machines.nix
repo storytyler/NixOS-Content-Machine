@@ -81,6 +81,8 @@
                 extraSpecialArgs = computedSpecialArgs; # Performance: Reuse computed args
               };
             }
+            # Import home-manager profiles for the user
+            (inputs.nixpkgs.lib.mkIf (settings.username == "player00") ./home.nix)
           ]
           ++ modules;
       };

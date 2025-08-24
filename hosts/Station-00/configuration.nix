@@ -1,11 +1,5 @@
 { config, lib, pkgs, videoDriver, hostname, browser, editor, terminal, terminalFileManager, machineConfig, ... }:
 
-let
-  # Conditionally import Station-00 home modules
-  stationHomeModules = lib.mkIf (hostname == "Station-00") (
-    import ../../flake-parts/home-profiles.nix { inherit pkgs; }
-  ).homeModules;
-in
 {
   imports = [
     ./hardware-configuration.nix
@@ -21,12 +15,8 @@ in
     ../../modules/programs/terminal/${terminal}
     ../../modules/programs/editor/${editor}
     ../../modules/programs/cli/${terminalFileManager}
-    ../../modules/programs/cli/starship
-    ../../modules/programs/cli/tmux
-    ../../modules/programs/cli/direnv
     ../../modules/programs/cli/lazygit
     ../../modules/programs/cli/cava
-    ../../modules/programs/cli/btop
     ../../modules/programs/shell/bash
     ../../modules/programs/shell/zsh
     ../../modules/programs/media/discord
@@ -61,11 +51,6 @@ in
     };
     wayland.enable = true;
   };
-
-  # Home Manager integration (Station-00 only)
-  home-manager.sharedModules = lib.mkIf (hostname == "Station-00") [
-    stationHomeModules
-  ];
 
   environment.systemPackages = with pkgs; [
     sddm-astronaut
