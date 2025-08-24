@@ -54,7 +54,7 @@ with lib; {
       # Productivity
       obsidian
       libreoffice
-
+      starship
       # Creative tools
       krita
       gimp
@@ -65,7 +65,7 @@ with lib; {
 
       # System tools
       gparted
-      ventoy-full
+     # ventoy.1.1.05
     ]
     ++ (optionals machineConfig.features.development [
       vscode
@@ -77,16 +77,18 @@ with lib; {
   services = {
     # Enable printing
     printing.enable = true;
+  };
 
+  hardware = {
     # Scanner support
     sane = {
       enable = true;
       extraBackends = [pkgs.sane-airscan];
     };
-
-    # Flatpak support for additional apps
-    flatpak.enable = machineConfig.features.multimedia;
   };
+
+  # Flatpak support for additional apps
+  services.flatpak.enable = machineConfig.features.multimedia;
 
   # Performance optimizations for desktop
   powerManagement.cpuFreqGovernor = "performance";

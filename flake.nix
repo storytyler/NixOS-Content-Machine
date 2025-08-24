@@ -101,7 +101,7 @@
 
       flake = {
         # Templates for development environments
-        templates = import ./dev-shells;
+        templates = import ./flake-parts/dev-shells;
 
         # Shared modules available to all configurations
         nixosModules = {

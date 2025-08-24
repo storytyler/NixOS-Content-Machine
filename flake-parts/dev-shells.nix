@@ -1,30 +1,53 @@
-{...}: {
-  perSystem = {pkgs, ...}: {
+# flake-parts/dev-shells.nix - Centralized shell management
+{
+  perSystem = {
+    config,
+    self',
+    inputs',
+    pkgs,
+    system,
+    ...
+  }: {
     devShells = {
-      # Enhanced default development shell for configuration work ONLY
-      default = pkgs.mkShell {
-        name = "nixos-config-development";
+      # Consolidated shells with shared dependency management
+      nix = pkgs.mkShell {
         buildInputs = with pkgs; [
-          git
-          gh
-          alejandra
+          nil
           nixd
-          deadnix
-          statix
-          nvd
-          nix-update
-          nixpkgs-review
-          npins
-          nix-du
+          alejandra
+          nixpkgs-fmt
           nix-tree
+          nix-diff
+          nvd
         ];
-        shellHook = ''
-          echo "NixOS Configuration Development Environment"
-          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-          echo "Use 'nix develop' for NixOS config work"
-          echo "Use 'nix flake init -t .#template-name' for language projects"
-        '';
-        NIX_CONFIG = "experimental-features = nix-command flakes";
+      };
+
+      rust = pkgs.mkShell {
+        buildInputs = with pkgs; [
+          rustc
+          cargo
+          clippy
+          rustfmt
+          rust-analyzer
+          pkg-config
+        ];
+      };
+
+      python = pkgs.mkShell {
+        buildInputs = with pkgs; [
+          python3
+          python3Packages.pip
+          python3Packages.virtualenv
+          ruff
+        ];
+      };
+
+      shell = pkgs.mkShell {
+        buildInputs = with pkgs; [
+          shellcheck
+          shfmt
+          bash-language-server
+        ];
       };
     };
   };

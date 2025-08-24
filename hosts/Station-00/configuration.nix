@@ -1,5 +1,4 @@
-{
-  pkgs,
+{ pkgs,
   videoDriver,
   hostname,
   browser,
@@ -9,15 +8,16 @@
   machineConfig,
   ...
 }: {
+
   imports = [
     ./hardware-configuration.nix
-    ../../modules/hardware/video/${videoDriver}.nix # Enable gpu drivers defined in flake.nix
+    ../../modules/hardware/video/${videoDriver}.nix # Enable GPU drivers defined in flake.nix
     ../../modules/hardware/drives
 
     ../common.nix
     ../../modules/scripts
 
-    ../../modules/desktop/hyprland # Enable hyprland window manager
+    ../../modules/desktop/hyprland # Enable Hyprland window manager
     # ../../modules/desktop/i3-gaps # Enable i3 window manager
 
     ../../modules/programs/games
@@ -34,7 +34,7 @@
     ../../modules/programs/shell/bash
     ../../modules/programs/shell/zsh
     ../../modules/programs/media/discord
-    ../../modules/programs/media/spicetify
+    # ../../modules/programs/media/spicetify
     ../../modules/programs/media/youtube-music
     ../../modules/programs/media/thunderbird
     ../../modules/programs/media/obs-studio
@@ -46,7 +46,8 @@
     # ../../modules/programs/misc/virt-manager
   ];
 
-  # SDDM Display Manager Configuration - theme package automatically available via overlay
+  programs.zsh.enable = true;
+
   services.displayManager.sddm = {
     enable = true;
     package = pkgs.kdePackages.sddm;
@@ -65,24 +66,14 @@
         ThemeDir = "/run/current-system/sw/share/sddm/themes";
       };
     };
+
+    wayland.enable = true; # Enable Wayland support for SDDM
   };
 
   # Home-manager config
   home-manager.sharedModules = [
-    (_: {
-      home.packages = with pkgs; [
-        # The sddm-astronaut package is available via machine-level overlay
-        # and automatically themed according to machineConfig.sddmTheme
-        sddm-astronaut
-
-        # Original packages
-        krita
-        github-desktop
-        gimp
-        obsidian
-        vlc
-      ];
-    })
+    # Import Station-00 Home Manager profile from home-profiles.nix
+    (import ../../flake-parts/home-profiles.nix { inherit pkgs; }).homeModules
   ];
 
   # System packages - themed package available automatically
@@ -111,6 +102,7 @@
       log_level = "error";
     };
   };
+
   users.users.minidlna = {
     extraGroups = ["users"]; # so minidlna can access the files.
   };

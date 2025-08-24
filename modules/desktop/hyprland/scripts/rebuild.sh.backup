@@ -1,0 +1,81 @@
+#!/usr/bin/env bash
+# scripts/deploy-nixos.sh
+
+set -e
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+FLAKE_DIR="$(dirname "$SCRIPT_DIR")"
+ACTION="${1:-switch}"
+TARGET="${2:-auto}"
+
+usage() {
+    echo "Usage: $0 [ACTION] [TARGET]"
+    echo "Actions: switch, boot, test, build, check"
+    echo "Targets: auto, Station-00, Scout-02, Subrelay-01, all"
+    echo ""
+    echo "Examples:"
+    echo "  $0 switch auto          # Auto-detect and deploy to current machine"
+    echo "  $0 switch Station-00    # Deploy to specific machine"
+    echo "  $0 test all             # Test configurations on all machines"
+}
+
+# Get available configurations
+get_configs() {
+    nix flake show "$FLAKE_DIR" --json 2>/dev/null | \
+        jq -r '.nixosConfigurations | keys[]' | \
+        grep -v "Default" | sort
+}
+
+# Deploy to single machine
+deploy_machine() {
+    local machine="$1"
+    local action="$2"
+    
+    echo "Deploying $action to $machine..."
+    
+    if [[ "$machine" == "$(hostname)" ]]; then
+        # Local deployment
+        sudo nixos-rebuild "$action" --flake "$FLAKE_DIR#$machine"
+    else
+        # Remote deployment (if you have remote machines)
+        echo "Note: Remote deployment to $machine would require network access"
+        # nixos-rebuild "$action" --flake "$FLAKE_DIR#$machine" --target-host "$machine.local"
+    fi
+}
+
+# Main logic
+case "$TARGET" in
+    auto)
+        CURRENT_HOST="$(hostname)"
+        if get_configs | grep -q "^$CURRENT_HOST$"; then
+            deploy_machine "$CURRENT_HOST" "$ACTION"
+        else
+            echo "No configuration found for current hostname: $CURRENT_HOST"
+            echo "Available configurations:"
+            get_configs | sed 's/^/  - /'
+            exit 1
+        fi
+        ;;
+    all)
+        if [[ "$ACTION" == "switch" ]]; then
+            echo "Error: Cannot switch all machines simultaneously"
+            echo "Use 'test' or 'build' for multi-machine actions"
+            exit 1
+        fi
+        
+        for config in $(get_configs); do
+            echo "Running nixos-rebuild $ACTION for $config..."
+            nix build "$FLAKE_DIR#nixosConfigurations.$config.config.system.build.toplevel"
+        done
+        ;;
+    Station-00|Scout-02|Subrelay-01)
+        deploy_machine "$TARGET" "$ACTION"
+        ;;
+    *)
+        echo "Invalid target: $TARGET"
+        usage
+        exit 1
+        ;;
+esac
+
+echo "Deployment completed successfully!"
